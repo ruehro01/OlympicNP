@@ -67,6 +67,11 @@ require([
         "title": "{RDNAME}",
         "content": "<b>Road Name: </b> {RDNAME}<br><b>Status: </b> {Status}<br><b>Status Reason: </b> {Status_Reason}<br>"
       }
+    
+    const popupBuildings = {
+        "title": "{BLDGNAME}",
+        "content": "<b>Building Name: </b> {BLDGNAME}<br><b>Type: </b> {BLDGTYPE}<br><b>Status: </b> {BLDGSTATUS}<br><b>Seasonal: </b> {SEASONAL}<br>"
+      }
 
     //Olympic National Park feature layer from AGOL(points)
     const olympicFeaturesLayer = new FeatureLayer({
@@ -104,7 +109,9 @@ require([
 
     //Buildings footprints layer from AGOL (lines)
     const buildingsLayer = new FeatureLayer({
-        url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/NPS_Buildings/FeatureServer"
+        url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/NPS_Buildings/FeatureServer",
+        outFields: ["BLDGNAME","BLDGSTATUS","BLDGTYPE","SEASONAL"],
+        popupTemplate: popupBuildings
     });
 
     map.add(buildingsLayer,0);

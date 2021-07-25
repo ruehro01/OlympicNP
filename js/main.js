@@ -34,14 +34,23 @@ require([
     view.ui.add(basemapToggle,"bottom-right");
     
     //Legend widget
-    const legend = new Legend({
-        view: view
+    const legend = new Expand({
+        content: new Legend({
+            view: view,
+            style: "classic"
+        }),
+        view: view,
+        expanded: false
     });
     view.ui.add(legend,"bottom-left");
     
     // Editor widget
-    const editor = new Editor({
+    const editor = new Expand({
+        content: new Editor({
         view: view
+        }),
+        view: view,
+        expanded: true
     });
     view.ui.add(editor, "top-right");
     

@@ -1,3 +1,4 @@
+//Array for use with Olympic Features filter
 var olympicFeaturesLayer;
 var arrPointType = [];
 
@@ -10,9 +11,11 @@ require([
     "esri/widgets/BasemapToggle",
     "esri/widgets/BasemapGallery",
     "esri/widgets/Expand",
+    "esri/widgets/Locate",
+    "esri/widgets/Home",
     "esri/layers/FeatureLayer",
     "esri/widgets/LayerList"
-], function (esriConfig, Map, MapView, Editor, Legend, BasemapToggle, BasemapGallery, Expand, FeatureLayer, LayerList) {
+], function (esriConfig, Map, MapView, Editor, Legend, BasemapToggle, BasemapGallery, Expand, Locate, Home, FeatureLayer, LayerList) {
 
 
     esriConfig.apiKey = "AAPKdb181dc3a61a4ddda4cbc697d98f329f9E1CFZ0Lq_Ie9Dc9_BoP52-zFupDSqEzEBAJtI_M2JQDr3dQGfO5J8pzOBrHPJmr";
@@ -20,9 +23,10 @@ require([
 
     // Create a map from the referenced webmap item id
     const map = new Map({
-        basemap: "arcgis-topographic" // Basemap layer service
+        basemap: "arcgis-topographic" // Basemap layer service (ArcGIS)
     });
 
+    //Set default view parameters
     const view = new MapView({
         center: [-123.5121, 47.6379], //Lat, Lon
         zoom: 9,
@@ -30,6 +34,22 @@ require([
         map: map,
         visibilityMode: 'exclusive'
     });
+    
+    const homeBtn = new Home({
+        view: view
+        });
+    view.ui.add(homeBtn, "top-left");
+    
+    //Geolocation widget 
+    const locate = new Locate({
+          view: view,
+          useHeadingEnabled: false,
+          goToOverride: function(view, options) {
+            options.target.scale = 5000;
+            return view.goTo(options.target);
+          }
+        });
+        view.ui.add(locate, "top-left");
 
     //Basemap toggle widget
     const basemapToggle = new BasemapToggle({
@@ -44,7 +64,7 @@ require([
             view: view
         }),
         view: view,
-        expanded: true
+        expanded: false
     });
     view.ui.add(editor, "top-right");
 
@@ -59,12 +79,17 @@ require([
     }
     const popupRoads = {
         "title": "{RDNAME}",
-        "content": "<b>Road Name: </b> {RDNAME}<br><b>Status: </b> {Status}<br><b>Status Reason: </b> {Status_Reason}<br>"
+        "content": "<b>Road Name: </b> {RDNAME}<br><b>Road Surface: </b> {RDSURFACE}<br><b>Seasonal: </b> {SEASONAL}<br><b>Maintainer: </b> {MAINTAINER}<br><b>Notes: </b> {NOTES}<br><b>Status: </b> {Status}<br><b>Status Reason: </b> {Status_Reason}<br>"
     }
 
     const popupBuildings = {
         "title": "{BLDGNAME}",
         "content": "<b>Building Name: </b> {BLDGNAME}<br><b>Type: </b> {BLDGTYPE}<br><b>Status: </b> {BLDGSTATUS}<br><b>Seasonal: </b> {SEASONAL}<br>"
+    }
+    
+    const popupRivers = {
+        "title": "{River}",
+        "content": "<b>Water Body Name: </b> {River}<br><b>Reach: </b> {Reach}<br><b>Description: </b> {Descriptio}<br><b>County: </b> {County}<br><b>Classification: </b> {Classification}<br><b>Watershed: </b> {Watershed_}<br>"
     }
 
     //Olympic National Park feature layer from AGOL(points)
@@ -100,7 +125,9 @@ require([
 
     //Rivers layer from AGOL (lines)
     const riversLayer = new FeatureLayer({
-        url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Olympic_National_Park_Rivers/FeatureServer"
+        url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Olympic_National_Park_Rivers/FeatureServer",
+        outFields: ["River","Reach","Descriptio","County","Classification","Watershed"],
+        popupTemplate: popupRivers
     });
 
     map.add(riversLayer, 0);
@@ -126,7 +153,7 @@ require([
 
         listItemCreatedFunction: function (event) {
             const item = event.item;
-            if (item.layer.type != "group") { // don't show legend twice
+            if (item.layer.type != "group") { // won't show legend twice
                 item.panel = {
                     content: "legend",
                     open: true

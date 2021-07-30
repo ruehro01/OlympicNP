@@ -37,11 +37,12 @@ body,
 /*Side bar filter*/
 
 .filter {
+    font-size: 14px;
     position: relative;
-    top: -85%;
+    top: -50%;
 }
 
 .offcanvas-header {
-    border-bottom: 1px solid #ccc;
+    border-bottom: 10px solid #ccc;
     background-color: rgba(0,0,0,.03);
 }
